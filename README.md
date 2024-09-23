@@ -1,12 +1,1 @@
-# WinPoi 🔥
-# Start
-<
-<
-<
-# Used Techs
-<
-<
-<
-<
-<
-<
+
