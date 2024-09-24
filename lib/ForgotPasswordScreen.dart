@@ -94,7 +94,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             SizedBox(height: 10),
             Text(
-              'Lütfen SMS veya e-posta adresinize gelen 6 haneli kodu giriniz.',
+              'Lütfen e-posta adresinize gelen 6 haneli kodu giriniz.',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),

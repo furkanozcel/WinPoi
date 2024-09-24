@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'ForgotPasswordScreen.dart'; // Güvenlik kodu ekranı için import
+import 'ForgotPasswordEmailScreen.dart'; // Güvenlik kodu ekranı için import
 import 'StartGameScreen.dart'; // Oyun başlamadan önceki ekran için import
 
 class LoginScreen extends StatefulWidget {
@@ -14,16 +14,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isUsernameValid = true;
   bool _isPasswordValid = true;
+  bool _isEmailFormatValid =
+      true; // E-posta formatının doğruluğunu kontrol etmek için yeni değişken
+
+  // E-posta formatını kontrol eden fonksiyon
+  bool _validateEmailFormat(String email) {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return emailRegex.hasMatch(email);
+  }
 
   void _login() {
     setState(() {
-      // Boş olup olmadığını kontrol et
+      // Boş olup olmadığını ve e-posta formatını kontrol et
       _isUsernameValid = _usernameController.text.isNotEmpty;
       _isPasswordValid = _passwordController.text.isNotEmpty;
+      _isEmailFormatValid = _validateEmailFormat(_usernameController.text);
     });
 
-    // Eğer her iki alan da doluysa girişe izin ver
-    if (_isUsernameValid && _isPasswordValid) {
+    // Eğer her iki alan dolu ve e-posta formatı doğruysa girişe izin ver
+    if (_isUsernameValid && _isPasswordValid && _isEmailFormatValid) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => StartGameScreen()),
@@ -64,21 +73,23 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _usernameController,
               decoration: InputDecoration(
                 labelText: 'Kullanıcı adı, e-posta veya cep numarası',
-                errorText: _isUsernameValid
-                    ? null
-                    : 'Bu alanı doldurunuz', // Hata mesajı
+                errorText: !_isUsernameValid
+                    ? 'Bu alanı doldurunuz'
+                    : !_isEmailFormatValid
+                        ? 'Geçerli bir e-posta adresi giriniz'
+                        : null, // E-posta formatı hatası
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: _isUsernameValid
-                        ? Colors.grey
-                        : Colors.red, // Kırmızı kenarlık
+                    color: !_isUsernameValid || !_isEmailFormatValid
+                        ? Colors.red
+                        : Colors.grey, // Hata durumunda kırmızı kenarlık
                   ),
                 ),
               ),
               onChanged: (value) {
                 setState(() {
-                  _isUsernameValid =
-                      value.isNotEmpty; // Doldurulursa kırmızılık kalksın
+                  _isUsernameValid = value.isNotEmpty;
+                  _isEmailFormatValid = _validateEmailFormat(value);
                 });
               },
             ),
@@ -96,14 +107,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderSide: BorderSide(
                     color: _isPasswordValid
                         ? Colors.grey
-                        : Colors.red, // Kırmızı kenarlık
+                        : Colors.red, // Hata durumunda kırmızı kenarlık
                   ),
                 ),
               ),
               onChanged: (value) {
                 setState(() {
                   _isPasswordValid =
-                      value.isNotEmpty; // Doldurulursa kırmızılık kalksın
+                      value.isNotEmpty; // Şifre alanı dolu mu kontrol et
                 });
               },
             ),
@@ -124,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            ForgotPasswordScreen()), // Güvenlik kodu ekranına yönlendirme
+                            ForgotPasswordEmailScreen()), // Güvenlik kodu ekranına yönlendirme
                   );
                 },
                 child: Text(
