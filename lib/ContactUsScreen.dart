@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ContactUsScreen extends StatelessWidget {
+  const ContactUsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bize Ulaşın'),
+        title: const Text('Bize Ulaşın'),
         backgroundColor: Colors.orange,
       ),
       body: Padding(
@@ -18,22 +20,23 @@ class ContactUsScreen extends StatelessWidget {
               label: 'Telefon',
               content: '0216 111 11 11',
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildContactInfoBox(
               icon: Icons.email,
               label: 'E-posta',
               content: 'findwinddestek@find.com.tr',
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Geri dönmek için
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
               ),
-              child: Text(
+              child: const Text(
                 'Geri Dön',
                 style: TextStyle(fontSize: 18),
               ),
@@ -50,7 +53,7 @@ class ContactUsScreen extends StatelessWidget {
       required String label,
       required String content}) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -59,14 +62,14 @@ class ContactUsScreen extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Row(
         children: [
           Icon(icon, size: 30, color: Colors.orange),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -77,10 +80,11 @@ class ContactUsScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.grey[700]),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
                 content,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ],
           ),

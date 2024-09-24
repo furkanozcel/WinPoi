@@ -4,13 +4,15 @@ import 'LoginScreen.dart'; // Ana ekrana dönmek için import
 import 'ResetPasswordScreen.dart'; // Şifre yenileme ekranı için import
 
 class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _codeController = TextEditingController();
-  List<TextEditingController> _codeInputControllers =
+  final List<TextEditingController> _codeInputControllers =
       List.generate(6, (index) => TextEditingController());
   int _remainingAttempts = 3; // Kalan deneme sayısı
   final String _correctCode = "123456"; // Doğru kodu belirliyoruz
@@ -37,7 +39,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else {
         // Tüm haklar bittiğinde ana ekrana dön
         _showSnackBar('3 kez yanlış kod girdiniz. Ana ekrana dönüyorsunuz.');
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 2), () {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -60,7 +62,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2), // Anlık olarak görünsün
+        duration: const Duration(seconds: 2), // Anlık olarak görünsün
         behavior: SnackBarBehavior.floating, // Ekranda daha üstte görünür
         margin:
             EdgeInsets.only(bottom: MediaQuery.of(context).size.height - 150),
@@ -71,9 +73,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.orange),
+          icon: const Icon(Icons.close, color: Colors.orange),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -85,31 +88,31 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('lib/assets/images/WinPoi Logo Turuncu.png',
+            Image.asset('lib/assets/images/WinPoi Logo Beyaz.png',
                 width: 80, height: 80),
-            SizedBox(height: 30),
-            Text(
+            const SizedBox(height: 30),
+            const Text(
               'Doğrulama Kodu',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               'Lütfen e-posta adresinize gelen 6 haneli kodu giriniz.',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(
                   6, (index) => _buildCodeInputBox(context, index)),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 // Kod tekrar gönder fonksiyonu burada olacak
               },
-              child: Text(
+              child: const Text(
                 'Kodu tekrar gönder',
                 style: TextStyle(
                   color: Colors.orange,
@@ -136,10 +139,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           controller: _codeInputControllers[index],
           textAlign: TextAlign.center,
           maxLength: 1,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 24, height: 1.5), // Yazılar biraz yukarı alındı
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             counterText: '', // Karakter sayısını gizle
             border: InputBorder.none,
           ),

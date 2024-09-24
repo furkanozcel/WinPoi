@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'ForgotPasswordScreen.dart'; // Doğrulama kodu ekranı için import
 
 class ForgotPasswordEmailScreen extends StatefulWidget {
+  const ForgotPasswordEmailScreen({super.key});
+
   @override
   _ForgotPasswordEmailScreenState createState() =>
       _ForgotPasswordEmailScreenState();
@@ -35,10 +37,11 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.orange),
+          icon: const Icon(Icons.arrow_back, color: Colors.orange),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -49,22 +52,22 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: Image.asset('lib/assets/images/WinPoi Logo Beyaz.png',
                   width: 100, height: 100),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Şifreyi Yenile',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Lütfen hesabınıza bağlı olan e-posta adresinizi girin. E-posta adresinize bir doğrulama kodu gönderilecektir.',
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // E-posta Girişi
             TextField(
               controller: _emailController,
@@ -73,7 +76,7 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                 errorText: _isEmailValid
                     ? null
                     : 'Geçerli bir e-posta adresi giriniz', // Hata mesajı
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               onChanged: (value) {
                 setState(() {
@@ -81,13 +84,13 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                 });
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Kod Gönder Butonu
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
                 onPressed: _sendVerificationCode, // E-posta doğrulama işlemi
-                child: Text('Kod Gönder'),
+                child: const Text('Kod Gönder'),
               ),
             ),
           ],

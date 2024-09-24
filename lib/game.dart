@@ -5,22 +5,38 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GameScreen extends StatefulWidget {
-  final String gameTitle; // Oyun başlığı alıyoruz
-  GameScreen({required this.gameTitle}); // Constructor
+  final String gameTitle;
+  const GameScreen({super.key, required this.gameTitle});
 
   @override
   _GameScreenState createState() => _GameScreenState();
 }
 
 class _GameScreenState extends State<GameScreen> {
-  Completer<GoogleMapController> _controller = Completer();
-  LatLng _currentPosition = LatLng(41.043038, 29.001945); // Başlangıç noktası
-  LatLng _targetPosition = LatLng(41.0428, 29.0055); // Ödülün bulunduğu konum
+  final Completer<GoogleMapController> _controller = Completer();
+
+  // Rastgele konum oluşturucu
+  final Random _random = Random();
+
+  // Rastgele konum aralıkları (Beşiktaş semti sınırları)
+  final double _minLatitude = 41.0410;
+  final double _maxLatitude = 41.0530;
+  final double _minLongitude = 29.0000;
+  final double _maxLongitude = 29.0250;
+
+  // Rastgele başlangıç noktası
+  LatLng _currentPosition =
+      const LatLng(41.043038, 29.001945); // Başlangıç noktası
+  LatLng _targetPosition =
+      const LatLng(41.0428, 29.0055); // Ödülün bulunduğu konum
   double _movementStep = 0.00002; // Normal hız (2 m/s)
-  double _zoomLevel = 20.0; // En yakınlaştırılmış hal
+  final double _zoomLevel = 20.0; // En yakınlaştırılmış hal
   bool _isSpeedBoostActive = false; // Hız artırma durumu
   bool _isTeleportActive = false; // Işınlanma aktif mi?
   bool _canMoveMap = false; // Harita hareket ettirilebilir mi?
+  bool _isMoving = false; // Hareket tamamlanana kadar yeni tıklamayı engelle
+  bool _isBirdViewActive = false; // Kuş bakışı modu aktif mi
+  double _originalZoomLevel = 20.0; // Zoom seviyesi saklama
 
   LatLng? _teleportPosition; // Işınlanma için seçilen nokta
   bool _showTeleportConfirmButton = false; // Işınlanmayı onaylama butonu
@@ -28,18 +44,29 @@ class _GameScreenState extends State<GameScreen> {
 
   int _countdown = 15; // Geri sayım için başlangıç değeri
   bool _gameStarted = false; // Oyun başladı mı kontrolü
-  bool _isBirdViewActive = false; // Kuş bakışı aktif mi?
-  double _originalZoomLevel = 20.0; // Orijinal yakınlaştırma seviyesi
 
   @override
   void initState() {
     super.initState();
-    _startCountdown(); // Geri sayımı başlat
+    _setRandomPositions(); // Oyuncu ve ödül için rastgele konum ayarla
+    _startCountdown();
+  }
+
+  // Oyuncu ve ödül için rastgele konum ayarla
+  void _setRandomPositions() {
+    _currentPosition = LatLng(
+      _minLatitude + _random.nextDouble() * (_maxLatitude - _minLatitude),
+      _minLongitude + _random.nextDouble() * (_maxLongitude - _minLongitude),
+    );
+    _targetPosition = LatLng(
+      _minLatitude + _random.nextDouble() * (_maxLatitude - _minLatitude),
+      _minLongitude + _random.nextDouble() * (_maxLongitude - _minLongitude),
+    );
   }
 
   // Geri sayım işlemini başlat
   void _startCountdown() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdown > 0) {
         setState(() {
           _countdown--;
@@ -53,6 +80,43 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  // Geri sayım için animasyonlu bir daire ve yazı
+  Widget _buildCountdownWidget() {
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Arka planda animasyonlu daire
+          AnimatedContainer(
+            duration: const Duration(seconds: 1),
+            width: 100 + (_countdown * 10),
+            height: 100 + (_countdown * 10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.orange.withOpacity(0.5),
+            ),
+          ),
+          // Ortadaki büyük geri sayım rakamı
+          Text(
+            '$_countdown',
+            style: const TextStyle(
+              fontSize: 60,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  blurRadius: 10.0,
+                  color: Colors.black,
+                  offset: Offset(5.0, 5.0),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Mesafeyi hesaplayan fonksiyon
   double _calculateDistance(LatLng start, LatLng end) {
     var p = 0.017453292519943295;
@@ -62,7 +126,7 @@ class _GameScreenState extends State<GameScreen> {
             cos(end.latitude * p) *
             (1 - cos((end.longitude - start.longitude) * p)) /
             2;
-    return 12742 * asin(sqrt(a)); // Mesafe kilometre cinsinden
+    return 12742 * asin(sqrt(a));
   }
 
   // Oyuncunun ödüle yaklaşma durumunu kontrol eden fonksiyon
@@ -88,22 +152,22 @@ class _GameScreenState extends State<GameScreen> {
     final GoogleMapController controller = await _controller.future;
 
     setState(() {
-      _isBirdViewActive = true; // Kuş bakışı aktif
-      _canMoveMap = false; // Hareket edemeyecek
-      _originalZoomLevel = _zoomLevel; // Şu anki zoom seviyesini sakla
+      _isBirdViewActive = true;
+      _canMoveMap = false;
+      _originalZoomLevel = _zoomLevel;
     });
 
-    // Haritayı uzaklaştır (10 saniye boyunca)
+    // Haritayı uzaklaştır (6 saniye boyunca)
     controller.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(target: _currentPosition, zoom: 15.0), // Uzaklaştır
+        CameraPosition(target: _currentPosition, zoom: 15.0),
       ),
     );
 
-    // 10 saniye sonra kuş bakışı modundan çık
-    await Future.delayed(Duration(seconds: 10), () {
+    // 6 saniye sonra kuş bakışı modundan çık
+    await Future.delayed(const Duration(seconds: 6), () {
       setState(() {
-        _isBirdViewActive = false; // Kuş bakışı modu sona erdi
+        _isBirdViewActive = false;
       });
 
       // Eski yakınlaştırma seviyesine geri dön
@@ -116,39 +180,74 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // Işınlanma modunu aktif hale getir
-  void _activateTeleport() {
+  void _activateTeleport() async {
+    final GoogleMapController controller = await _controller.future;
+
     setState(() {
-      _isTeleportActive = true; // Işınlanma aktif
-      _canMoveMap = true; // Harita serbestçe hareket ettirilebilir
+      _isTeleportActive = true;
+      _canMoveMap = true;
     });
+
+    // Haritayı uzaklaştır (ışınlanma için)
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: _currentPosition, zoom: 15.0),
+      ),
+    );
   }
 
-  // Işınlanmayı onayla
-  void _confirmTeleport() {
-    if (_teleportPosition != null) {
-      setState(() {
-        _currentPosition = _teleportPosition!; // Seçilen konuma ışınlan
-        _isTeleportActive = false; // Işınlanma modu kapatıldı
-        _canMoveMap = false; // Harita tekrar kilitlendi
-        _showTeleportConfirmButton = false; // Onay butonu gizlendi
-      });
-      _checkProximity(); // Sıcak-soğuk efektini tekrar çalıştır
-    }
+  // Işınlanmayı onayla ve tıklanan yere ışınlan
+  void _confirmTeleport(LatLng newPosition) {
+    setState(() {
+      _currentPosition = newPosition;
+      _isTeleportActive = false;
+      _canMoveMap = false;
+      _showTeleportConfirmButton = false;
+    });
+    _checkProximity();
   }
 
-  // Hız artırma fonksiyonu (5 saniye boyunca hız artacak)
+  // Işınlanma işlemi için onay popup'ı
+  Future<void> _showTeleportConfirmationDialog(LatLng position) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Bu noktaya ışınlanmak istiyor musunuz?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Hayır'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Evet'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _confirmTeleport(position);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Hız artırma fonksiyonu
   void _activateSpeedBoost() {
     if (!_isSpeedBoostActive) {
       setState(() {
         _movementStep = 0.00008; // 8 m/s hız
-        _isSpeedBoostActive = true; // Hız artırma aktif
+        _isSpeedBoostActive = true;
       });
 
       // 5 saniye sonra hız normale dönecek
-      Timer(Duration(seconds: 5), () {
+      Timer(const Duration(seconds: 5), () {
         setState(() {
-          _movementStep = 0.00002; // Hız normale dönüyor (2 m/s)
-          _isSpeedBoostActive = false; // Hız artırma bitiyor
+          _movementStep = 0.00002; // 2 m/s hız
+          _isSpeedBoostActive = false;
         });
       });
     }
@@ -158,22 +257,22 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> _showExitConfirmationDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // Kullanıcı dışına tıklayarak kapatamaz
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Çıkmak istediğinizden emin misiniz?'),
+          title: const Text('Çıkmak istediğinizden emin misiniz?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Hayır'),
+              child: const Text('Hayır'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dialog'u kapat ve oyuna devam et
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Evet'),
+              child: const Text('Evet'),
               onPressed: () {
-                Navigator.of(context).pop(); // Dialog'u kapat
-                Navigator.pop(context); // Oyundan çık ve menüye dön
+                Navigator.of(context).pop();
+                Navigator.pop(context);
               },
             ),
           ],
@@ -186,10 +285,10 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.gameTitle), // Oyun başlığı üst kısımda gösteriliyor
+        title: Text(widget.gameTitle),
         leading: IconButton(
-          icon: Icon(Icons.exit_to_app),
-          onPressed: _showExitConfirmationDialog, // Çıkış onay popup'ı
+          icon: const Icon(Icons.exit_to_app),
+          onPressed: _showExitConfirmationDialog,
         ),
       ),
       body: Stack(
@@ -197,52 +296,46 @@ class _GameScreenState extends State<GameScreen> {
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _currentPosition,
-              zoom: _zoomLevel, // Yakınlaştırma seviyesi
+              zoom: _zoomLevel,
             ),
             markers: {
               Marker(
-                markerId: MarkerId("currentPosition"),
+                markerId: const MarkerId("currentPosition"),
                 position: _currentPosition,
                 icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue), // Oyuncu konumu
+                    BitmapDescriptor.hueBlue),
               ),
               Marker(
-                markerId: MarkerId("targetPosition"),
+                markerId: const MarkerId("targetPosition"),
                 position: _targetPosition,
                 icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueGreen), // Ödül konumu
+                    BitmapDescriptor.hueGreen),
               ),
               if (_teleportPosition != null)
                 Marker(
-                  markerId: MarkerId("teleportPosition"),
+                  markerId: const MarkerId("teleportPosition"),
                   position: _teleportPosition!,
                   icon: BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueOrange), // Işınlanma hedefi
+                      BitmapDescriptor.hueOrange),
                 ),
             },
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
             },
-            onTap: _isTeleportActive
+            onTap: _isTeleportActive && !_isMoving
                 ? (LatLng position) {
-                    setState(() {
-                      _teleportPosition = position; // Tıklanan konumu kaydet
-                      _showTeleportConfirmButton = true; // Onay butonunu göster
-                    });
+                    _showTeleportConfirmationDialog(position);
                   }
-                : null, // Sadece ışınlanma modunda aktif
-            scrollGesturesEnabled: _canMoveMap, // Haritayı kaydırabilme
-            zoomGesturesEnabled: _canMoveMap, // Zoom yapabilme
+                : null,
+            scrollGesturesEnabled: _canMoveMap,
+            zoomGesturesEnabled: _canMoveMap,
           ),
-          // Geri sayım ekranı (oyun başlamadan önce)
+          // Geri sayım ekranı
           if (!_gameStarted)
             Center(
               child: Container(
                 color: Colors.black.withOpacity(0.5),
-                child: Text(
-                  'Oyun $_countdown saniye sonra başlayacak...',
-                  style: TextStyle(fontSize: 30, color: Colors.white),
-                ),
+                child: _buildCountdownWidget(),
               ),
             ),
           // Sıcak-soğuk efektleri
@@ -253,7 +346,7 @@ class _GameScreenState extends State<GameScreen> {
                   center: const Alignment(0.0, 0.0),
                   radius: 0.5,
                   colors: [Colors.transparent, _proximityColor],
-                  stops: [0.8, 1.0],
+                  stops: const [0.8, 1.0],
                 ),
               ),
             ),
@@ -266,28 +359,28 @@ class _GameScreenState extends State<GameScreen> {
               child: Column(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_upward),
+                    icon: const Icon(Icons.arrow_upward),
                     color: Colors.black,
-                    onPressed: _moveUp,
+                    onPressed: !_isMoving ? _moveUp : null,
                   ),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back),
                         color: Colors.black,
-                        onPressed: _moveLeft,
+                        onPressed: !_isMoving ? _moveLeft : null,
                       ),
                       IconButton(
-                        icon: Icon(Icons.arrow_forward),
+                        icon: const Icon(Icons.arrow_forward),
                         color: Colors.black,
-                        onPressed: _moveRight,
+                        onPressed: !_isMoving ? _moveRight : null,
                       ),
                     ],
                   ),
                   IconButton(
-                    icon: Icon(Icons.arrow_downward),
+                    icon: const Icon(Icons.arrow_downward),
                     color: Colors.black,
-                    onPressed: _moveDown,
+                    onPressed: !_isMoving ? _moveDown : null,
                   ),
                 ],
               ),
@@ -295,46 +388,34 @@ class _GameScreenState extends State<GameScreen> {
           // Hız artırma butonu sol altta
           if (_gameStarted)
             Positioned(
-              bottom: 50, // Yerden yükseklik
-              left: 20, // Soldan uzaklık (sol alt köşeye yerleşecek)
+              bottom: 50,
+              left: 20,
               child: IconButton(
-                icon: Image.asset(
-                    'lib/assets/images/Group.png'), // Hız artırma ikonu
+                icon: Image.asset('lib/assets/images/Group.png'),
                 iconSize: 40,
-                onPressed: _activateSpeedBoost, // Hız artırma fonksiyonu
+                onPressed: _activateSpeedBoost,
               ),
             ),
-          // Işınlanma butonu (sol altta)
+          // Işınlanma butonu
           if (_gameStarted)
             Positioned(
-              bottom: 50, // Yerden yükseklik
-              left: 100, // Soldan uzaklık
+              bottom: 50,
+              left: 100,
               child: IconButton(
-                icon: Icon(Icons.my_location, color: Colors.purple, size: 40),
-                onPressed: _activateTeleport, // Işınlanma modunu aktif et
+                icon: const Icon(Icons.my_location,
+                    color: Colors.purple, size: 40),
+                onPressed: _activateTeleport,
               ),
             ),
-          // Kuş bakışı butonu (sağ alt köşe)
+          // Kuş bakışı butonu
           if (_gameStarted)
             Positioned(
-              bottom: 50, // Yerden yükseklik
-              right: 100, // Sağdan uzaklık
+              bottom: 50,
+              left: 180,
               child: IconButton(
-                icon: Image.asset(
-                    'lib/assets/images/kusbaskısı.png'), // Kuş bakışı ikonu
+                icon: Image.asset('lib/assets/images/kusbaskısı.png'),
                 iconSize: 40,
-                onPressed: _activateBirdView, // Kuş bakışı fonksiyonu
-              ),
-            ),
-          // Işınlanmayı onayla butonu
-          if (_showTeleportConfirmButton)
-            //Furkan Özçelik ve Halil Eren Pabuçcu
-            Positioned(
-              bottom: 150,
-              right: 20,
-              child: ElevatedButton(
-                child: Text("Işınlanmayı Onayla"),
-                onPressed: _confirmTeleport,
+                onPressed: _activateBirdView,
               ),
             ),
         ],
@@ -346,7 +427,7 @@ class _GameScreenState extends State<GameScreen> {
   void _moveUp() {
     LatLng newPosition = LatLng(
         _currentPosition.latitude + _movementStep, _currentPosition.longitude);
-    _smoothMove(_currentPosition, newPosition, 20); // 20 adımda kayarak gitme
+    _smoothMove(_currentPosition, newPosition, 20);
   }
 
   void _moveDown() {
@@ -369,13 +450,19 @@ class _GameScreenState extends State<GameScreen> {
 
   // Haritayı kayarak hareket ettir
   Future<void> _smoothMove(LatLng from, LatLng to, int steps) async {
+    if (_isMoving) return;
+
+    setState(() {
+      _isMoving = true;
+    });
+
     final GoogleMapController controller = await _controller.future;
 
     double deltaLat = (to.latitude - from.latitude) / steps;
     double deltaLng = (to.longitude - from.longitude) / steps;
 
     for (int i = 0; i < steps; i++) {
-      await Future.delayed(Duration(milliseconds: 50), () {
+      await Future.delayed(const Duration(milliseconds: 50), () {
         double newLat = from.latitude + deltaLat * i;
         double newLng = from.longitude + deltaLng * i;
         LatLng newPosition = LatLng(newLat, newLng);
@@ -394,7 +481,10 @@ class _GameScreenState extends State<GameScreen> {
       });
     }
 
-    // Yaklaşma efektini kontrol et
+    setState(() {
+      _isMoving = false;
+    });
+
     _checkProximity();
   }
 }
