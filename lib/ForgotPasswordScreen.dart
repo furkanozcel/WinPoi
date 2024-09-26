@@ -24,7 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       // Eğer doğru kod girildiyse şifre yenileme ekranına geç
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => ResetPasswordScreen()),
+        MaterialPageRoute(builder: (context) => const ResetPasswordScreen()),
       );
     } else {
       // Eğer yanlış kod girildiyse
@@ -42,7 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Future.delayed(const Duration(seconds: 2), () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
           );
         });
       }

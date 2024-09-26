@@ -30,7 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // Eğer tüm alanlar doğruysa giriş ekranına yönlendir
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     }
   }
@@ -128,13 +128,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              // Kayıt ol butonu
+              // Tıklanabilir metin
               Center(
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                  onPressed: _signUp,
-                  child: const Text('Devam'),
+                child: GestureDetector(
+                  onTap: _signUp,
+                  child: const Text(
+                    'Devam',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
+                  ),
                 ),
               ),
             ],

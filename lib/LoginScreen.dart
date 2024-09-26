@@ -36,7 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => StartGameScreen()), // Oyun ekranına geçiş
+            builder: (context) =>
+                const StartGameScreen()), // Oyun ekranına geçiş
       );
     }
   }
@@ -152,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ForgotPasswordEmailScreen(),
+                        builder: (context) => const ForgotPasswordEmailScreen(),
                       ),
                     );
                   },

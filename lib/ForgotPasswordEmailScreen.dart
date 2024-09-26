@@ -29,7 +29,7 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
       // E-posta geçerliyse doğrulama kodu ekranına yönlendir
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+        MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
       );
     }
   }

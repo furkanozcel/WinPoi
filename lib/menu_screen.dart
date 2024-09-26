@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'ContactUsScreen.dart'; // Bize ulaşın sayfasını import ediyoruz
+import 'menuScreenSayfalari/ContractsScreen.dart'; // Sözleşmeler sayfasını import ediyoruz
+import 'menuScreenSayfalari/FAQScreen.dart'; // SSS sayfasını import ediyoruz
+import 'menuScreenSayfalari/GameHistoryScreen.dart'; // Oyun geçmişi sayfasını import ediyoruz
+import 'menuScreenSayfalari/PaymentScreen.dart'; // Ödeme yöntemi sayfasını import ediyoruz
+import 'menuScreenSayfalari/ProfileScreen.dart'; // Profil sayfasını import ediyoruz
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -16,19 +21,25 @@ class MenuScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 170),
+              const SizedBox(height: 170),
               Center(
                 // Beyaz logo burada kullanıldı
                 child: Image.asset('lib/assets/images/WinPoi Logo Beyaz.png',
                     width: 80, height: 80),
               ),
               const SizedBox(height: 40),
-              _buildMenuItem(Icons.person, 'Profil'),
-              _buildMenuItem(Icons.payment, 'Ödeme yöntemi'),
-              _buildMenuItem(Icons.history, 'Oyun geçmişi'),
-              _buildMenuItem(Icons.help_outline, 'SSS'),
-              _buildMenuItem(Icons.article, 'Sözleşmeler'),
-              _buildMenuItem(Icons.contact_mail, 'Bize ulaşın', context),
+              _buildMenuItem(
+                  Icons.person, 'Profil', context, const ProfileScreen()),
+              _buildMenuItem(Icons.payment, 'Ödeme yöntemi', context,
+                  const PaymentScreen()),
+              _buildMenuItem(Icons.history, 'Oyun geçmişi', context,
+                  const GameHistoryScreen()),
+              _buildMenuItem(
+                  Icons.help_outline, 'SSS', context, const FAQScreen()),
+              _buildMenuItem(Icons.article, 'Sözleşmeler', context,
+                  const ContractsScreen()),
+              _buildMenuItem(Icons.contact_mail, 'Bize ulaşın', context,
+                  const ContactUsScreen()),
               const SizedBox(height: 5),
               TextButton(
                 onPressed: () {
@@ -44,7 +55,9 @@ class MenuScreen extends StatelessWidget {
         ),
       ),
 
+      // Alt kısım (BottomAppBar) beyaz yapıldı
       bottomNavigationBar: BottomAppBar(
+        color: Colors.white, // Alt çubuk arka planı beyaz yapıldı
         child: IconButton(
           icon: Image.asset(
             'lib/assets/images/Setting.png', // Kullanıcıdan alınan görsel burada kullanıldı
@@ -59,7 +72,8 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String text, [BuildContext? context]) {
+  Widget _buildMenuItem(
+      IconData icon, String text, BuildContext context, Widget targetScreen) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
@@ -70,14 +84,10 @@ class MenuScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         onTap: () {
-          if (text == 'Bize ulaşın' && context != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ContactUsScreen()),
-            );
-          } else {
-            // Diğer menü öğeleri için işlevler burada eklenebilir
-          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => targetScreen),
+          );
         },
       ),
     );
