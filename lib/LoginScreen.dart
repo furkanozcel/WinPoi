@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth için import
 import 'package:flutter/material.dart';
 
 import 'ForgotPasswordEmailScreen.dart'; // Şifre sıfırlama ekranı için import
@@ -11,12 +12,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isUsernameValid = true;
   bool _isPasswordValid = true;
-  bool _isEmailFormatValid = true; // E-posta formatı doğrulama değişkeni
+  bool _isEmailFormatValid = true;
+
+  bool _isLoading = false;
+  String? _errorMessage;
 
   // E-posta formatını kontrol eden fonksiyon
   bool _validateEmailFormat(String email) {
@@ -24,22 +30,77 @@ class _LoginScreenState extends State<LoginScreen> {
     return emailRegex.hasMatch(email);
   }
 
-  void _login() {
+  void _login() async {
     setState(() {
-      // Kullanıcı adı ve şifre boş mu kontrol et, ayrıca e-posta formatı doğru mu
       _isUsernameValid = _usernameController.text.isNotEmpty;
       _isPasswordValid = _passwordController.text.isNotEmpty;
       _isEmailFormatValid = _validateEmailFormat(_usernameController.text);
+      _errorMessage = null;
     });
 
     if (_isUsernameValid && _isPasswordValid && _isEmailFormatValid) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const StartGameScreen()), // Oyun ekranına geçiş
-      );
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Firebase Auth ile giriş yapma
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: _usernameController.text.trim(),
+          password: _passwordController.text,
+        );
+
+        User? user = userCredential.user;
+
+        if (user != null && !user.emailVerified) {
+          // E-posta doğrulanmadıysa kullanıcıya bilgi ver
+          setState(() {
+            _errorMessage = 'E-posta adresinizi doğrulamanız gerekiyor.';
+          });
+          await user.sendEmailVerification();
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+
+        // Başarılıysa oyun ekranına yönlendir
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const StartGameScreen()),
+        );
+      } on FirebaseAuthException catch (e) {
+        // Hata durumunda mesaj göster
+        setState(() {
+          if (e.code == 'user-not-found') {
+            _errorMessage = 'Bu e-posta ile kayıtlı kullanıcı bulunamadı.';
+          } else if (e.code == 'wrong-password') {
+            _errorMessage = 'Yanlış şifre girdiniz.';
+          } else if (e.code == 'user-disabled') {
+            _errorMessage = 'Bu kullanıcı hesabı devre dışı bırakılmış.';
+          } else if (e.code == 'invalid-email') {
+            _errorMessage = 'Geçersiz e-posta adresi girdiniz.';
+          } else {
+            _errorMessage = e.message;
+          }
+        });
+      } catch (e) {
+        setState(() {
+          _errorMessage = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        });
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -85,11 +146,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 40),
+              // Hata mesajı
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
               // Kullanıcı adı/e-posta girişi
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Kullanıcı adı, e-posta veya cep numarası',
+                  labelText: 'E-posta adresi',
                   errorText: !_isUsernameValid
                       ? 'Bu alanı doldurunuz'
                       : !_isEmailFormatValid
@@ -131,21 +201,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              // Giriş yap yazısı
+              // Giriş yap butonu veya yükleniyor göstergesi
               Center(
-                child: GestureDetector(
-                  onTap: _login,
-                  child: const Text(
-                    'Giriş yap',
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : GestureDetector(
+                        onTap: _login,
+                        child: const Text(
+                          'Giriş yap',
+                          style: TextStyle(
+                            color: Colors.orange,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
               ),
-              const SizedBox(height: 450),
+              const SizedBox(height: 20),
               // Şifreni mi unuttun yazısı
               Center(
                 child: GestureDetector(

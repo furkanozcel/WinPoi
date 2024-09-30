@@ -1,9 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'LoginScreen.dart'; // LoginScreen'i doğru import ettiğinizden emin olun
 import 'SignUpScreen.dart'; // SignUpScreen'i doğru import ettiğinizden emin olun
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

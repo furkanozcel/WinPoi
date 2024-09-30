@@ -69,10 +69,10 @@ class ProfileScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               elevation: 5,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
+              child: const Padding(
+                padding: EdgeInsets.all(16.0),
                 child: Column(
-                  children: const [
+                  children: [
                     Text(
                       'Kullanıcı Adı',
                       style: TextStyle(
