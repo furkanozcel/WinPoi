@@ -10,7 +10,7 @@ class GameHistoryScreen extends StatelessWidget {
         title: const Text('Oyun Geçmişi'),
       ),
       body: Center(
-        child: Image.asset('lib/assets/images/WinPoi Logo Beyaz.png',
+        child: Image.asset('lib/images/WinPoi Logo Beyaz.png',
             width: 150, height: 150),
       ),
     );

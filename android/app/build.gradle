@@ -20,7 +20,7 @@ def flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "
 def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
 android {
-    namespace = "com.example.findwin"
+    namespace = "com.example.winpoipo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -30,11 +30,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.myapp"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutterVersionCode.toInteger()
-        versionName = flutterVersionName
+        applicationId "com.example.winpoipo" // Uygulama ID'nizi buraya yazın
+        minSdkVersion 23
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -55,7 +56,9 @@ dependencies {
     implementation ('androidx.appcompat:appcompat:1.3.0') {
         exclude group: 'androidx.savedstate', module: 'savedstate'
     }
-    // Diğer bağımlılıklarınız
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth'
+
 }
 
 configurations.all {
@@ -66,3 +69,4 @@ configurations.all {
         }
     }
 }
+apply plugin: 'com.google.gms.google-services'

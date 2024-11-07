@@ -89,7 +89,7 @@ Genel Bilgi: Bu oyun Playstation 5 kazanma şansı sunuyor.
           children: [
             IconButton(
               icon: Image.asset(
-                'lib/assets/images/Gift.png', // Hediye simgesi
+                'lib/images/Gift.png', // Hediye simgesi
                 width: 300,
                 height: 100,
               ),

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "849542900260",
-    "project_id": "winpoi",
-    "storage_bucket": "winpoi.appspot.com"
+    "project_number": "91118405256",
+    "project_id": "winpoipo",
+    "storage_bucket": "winpoipo.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:849542900260:android:42dd352af06c309bca86b1",
+        "mobilesdk_app_id": "1:91118405256:android:35f229551f43677f70413d",
         "android_client_info": {
           "package_name": "com.example.myapp"
         }
@@ -15,7 +15,27 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA5AzErmRT84cbW4YziPR3mSDldxdKQBsI"
+          "current_key": "AIzaSyAYEvxSKwS4goo3rOCb1nJ2-g8OHgcC1Ck"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91118405256:android:0b784c329a92a3d270413d",
+        "android_client_info": {
+          "package_name": "com.example.winpoipo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "client_id": "91118405256-81at7js2tgmb1so91epjr95nojt02c97.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "services": {

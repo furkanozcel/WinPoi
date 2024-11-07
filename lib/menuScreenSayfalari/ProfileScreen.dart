@@ -1,5 +1,5 @@
-import 'package:findwin/main.dart'; // main.dart dosyasını import edin
 import 'package:flutter/material.dart';
+import 'package:winpoipo/main.dart'; // main.dart dosyasını import edin
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -36,8 +36,8 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       radius: 60, // Profil fotoğrafı boyutu
-                      backgroundImage: const AssetImage(
-                          'lib/assets/images/WinPoi Logo Beyaz.png'),
+                      backgroundImage:
+                          const AssetImage('lib/images/WinPoi Logo Beyaz.png'),
                       backgroundColor:
                           Colors.grey[200], // Profil fotoğrafı arka plan rengi
                     ),
@@ -129,7 +129,7 @@ class ProfileScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const MyApp(), // main.dart içindeki MyApp ana widget'ına yönlendirir
+                        MyApp(), // main.dart içindeki MyApp ana widget'ına yönlendirir
                   ),
                 );
               },
