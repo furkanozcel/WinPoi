@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "91118405256",
     "project_id": "winpoipo",
-    "storage_bucket": "winpoipo.appspot.com"
+    "storage_bucket": "winpoipo.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,12 @@
           "package_name": "com.example.myapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "91118405256-81at7js2tgmb1so91epjr95nojt02c97.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAYEvxSKwS4goo3rOCb1nJ2-g8OHgcC1Ck"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91118405256-81at7js2tgmb1so91epjr95nojt02c97.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "91118405256-ij5641kn4ie4ef297bpmj2qm63636sse.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.winpoipo"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,16 +48,32 @@
           "package_name": "com.example.winpoipo"
         }
       },
-      "oauth_client": [],
-      "api_key": [
+      "oauth_client": [
         {
           "client_id": "91118405256-81at7js2tgmb1so91epjr95nojt02c97.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYEvxSKwS4goo3rOCb1nJ2-g8OHgcC1Ck"
+        }
+      ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91118405256-81at7js2tgmb1so91epjr95nojt02c97.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "91118405256-ij5641kn4ie4ef297bpmj2qm63636sse.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.winpoipo"
+              }
+            }
+          ]
         }
       }
     }
