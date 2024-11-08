@@ -391,7 +391,7 @@ class _GameScreenState extends State<GameScreen> {
               bottom: 50,
               left: 20,
               child: IconButton(
-                icon: Image.asset('lib/assets/images/Group.png'),
+                icon: Image.asset('lib/images/Group.png'),
                 iconSize: 40,
                 onPressed: _activateSpeedBoost,
               ),
@@ -413,7 +413,7 @@ class _GameScreenState extends State<GameScreen> {
               bottom: 50,
               left: 180,
               child: IconButton(
-                icon: Image.asset('lib/assets/images/kusbaskısı.png'),
+                icon: Image.asset('lib/images/kusbaskısı.png'),
                 iconSize: 40,
                 onPressed: _activateBirdView,
               ),

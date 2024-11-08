@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'MenuScreen.dart'; // Menü ekranını ekledik
 import 'game.dart'; // Oyun ekranı
-import 'menu_screen.dart'; // Menü ekranını ekledik
 
 class StartGameScreen extends StatefulWidget {
   const StartGameScreen({super.key});
